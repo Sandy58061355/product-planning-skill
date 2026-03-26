@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手術時間即時記錄系統 — 產品企劃報告</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;background:#f8f9fa;color:#2d3436;line-height:1.7;font-size:15px}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:white;padding:80px 40px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 70%,rgba(233,69,96,0.15) 0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(83,52,131,0.15) 0%,transparent 50%);pointer-events:none}
+.hero-badge{display:inline-block;background:rgba(233,69,96,0.2);border:1px solid rgba(233,69,96,0.5);color:#e94560;padding:4px 16px;border-radius:20px;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.hero h1{font-size:40px;font-weight:700;margin-bottom:16px;line-height:1.3}
+.hero .subtitle{font-size:17px;color:rgba(255,255,255,0.75);max-width:620px;margin:0 auto 32px}
+.hero-meta{display:flex;gap:32px;justify-content:center;font-size:13px;color:rgba(255,255,255,0.55);flex-wrap:wrap}
+
+/* Nav */
+.sticky-nav{position:sticky;top:0;z-index:100;background:white;box-shadow:0 2px 20px rgba(0,0,0,0.08)}
+.nav-inner{display:flex;max-width:1100px;margin:0 auto;overflow-x:auto}
+.nav-item{flex:1;min-width:110px;padding:15px 16px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:#636e72;border-bottom:3px solid transparent;transition:all 0.2s;text-decoration:none;display:block;white-space:nowrap}
+.nav-item:hover{color:#0f3460;background:#f8f9fa}
+.nav-item.active{color:#e94560;border-bottom-color:#e94560}
+
+/* Container */
+.container{max-width:1100px;margin:0 auto;padding:60px 24px}
+
+/* Section header */
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:40px;padding-bottom:20px;border-bottom:2px solid #e9ecef}
+.section-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.icon-discover{background:linear-gradient(135deg,#667eea,#764ba2)}
+.icon-define{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.icon-develop{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.icon-deliver{background:linear-gradient(135deg,#43e97b,#38f9d7)}
+.icon-entry{background:linear-gradient(135deg,#f6d365,#fda085)}
+.section-header-text h2{font-size:26px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
+.section-header-text p{font-size:14px;color:#636e72}
+
+/* Subsection title */
+.subsection-title{font-size:17px;font-weight:700;color:#1a1a2e;margin:40px 0 16px;display:flex;align-items:center;gap:10px}
+.subsection-title::before{content:'';display:block;width:4px;height:20px;background:#e94560;border-radius:2px;flex-shrink:0}
+
+/* Card */
+.card{background:white;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.06);padding:28px;margin-bottom:24px;transition:transform 0.2s,box-shadow 0.2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.1)}
+.card-title{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f0f0f0}
+
+/* Insight box */
+.insight-box{background:linear-gradient(135deg,#fff3cd,#ffeeba);border:1px solid #ffc107;border-radius:10px;padding:16px 20px;margin-bottom:24px;font-size:14px}
+.insight-box strong{color:#856404;display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:14px;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.06)}
+thead th{background:#1a1a2e;color:white;padding:13px 15px;text-align:left;font-weight:600;font-size:13px}
+tbody tr:nth-child(even){background:#f8f9fa}
+tbody tr:hover{background:#eef2ff}
+tbody td{padding:11px 15px;border-bottom:1px solid #f0f0f0;vertical-align:top;font-size:13px}
+
+/* Persona grid */
+.persona-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-bottom:32px}
+.persona-card{background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.06);overflow:hidden;transition:transform 0.2s,box-shadow 0.2s}
+.persona-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.12)}
+.persona-card-header{padding:20px;color:white}
+.p1h{background:linear-gradient(135deg,#667eea,#764ba2)}
+.p2h{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.p3h{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.p4h{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e}
+.persona-name{font-size:20px;font-weight:700;margin-bottom:4px}
+.persona-role{font-size:12px;opacity:0.85}
+.persona-priority{display:inline-block;background:rgba(255,255,255,0.25);padding:2px 10px;border-radius:12px;font-size:11px;margin-top:8px}
+.persona-card-body{padding:20px}
+.persona-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tag{font-size:11px;padding:3px 10px;border-radius:12px;background:#f0f4ff;color:#3d5af1;font-weight:500}
+.pain-points{border-left:3px solid #e94560;padding-left:12px;margin-top:12px}
+.pain-points h4{font-size:11px;color:#e94560;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.pain-points ul{list-style:none;font-size:13px;color:#636e72}
+.pain-points li{padding:3px 0 3px 12px;position:relative}
+.pain-points li::before{content:'·';position:absolute;left:0;color:#e94560;font-weight:700}
+.info-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:13px}
+.info-label{font-weight:600;color:#636e72;min-width:52px;font-size:12px;flex-shrink:0}
+
+/* Accordion */
+.accordion{margin-bottom:6px}
+.accordion summary{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:13px 20px;cursor:pointer;font-weight:600;font-size:13px;color:#1a1a2e;list-style:none;display:flex;align-items:center;justify-content:space-between;transition:background 0.2s}
+.accordion summary::-webkit-details-marker{display:none}
+.accordion summary:hover{background:#eef2ff}
+.accordion summary::after{content:'▼';font-size:10px;color:#636e72;transition:transform 0.3s}
+.accordion[open] summary::after{transform:rotate(180deg)}
+.accordion[open] summary{background:#eef2ff;border-color:#667eea;color:#3d5af1}
+.accordion-content{padding:20px;border:1px solid #e9ecef;border-top:none;border-radius:0 0 8px 8px;background:white}
+.detail-row{display:grid;grid-template-columns:80px 1fr;gap:8px 12px;margin-bottom:10px;font-size:13px}
+.detail-label{font-weight:600;color:#636e72;font-size:12px;padding-top:2px}
+
+/* HMW grid */
+.hmw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-bottom:32px}
+.hmw-card{background:white;border-radius:12px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,0.06);border-left:4px solid #667eea;transition:transform 0.2s,box-shadow 0.2s}
+.hmw-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.1)}
+.hmw-num{font-size:11px;font-weight:700;color:#667eea;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.hmw-pain{font-size:12px;color:#636e72;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e9ecef}
+.hmw-question{font-size:13px;font-weight:600;color:#1a1a2e;line-height:1.5}
+
+/* Matrix */
+.matrix-wrapper{display:flex;align-items:stretch;gap:8px;margin-bottom:32px}
+.matrix-y-label{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:12px;color:#636e72;font-weight:600;letter-spacing:1px;align-self:center;flex-shrink:0}
+.matrix-outer{flex:1}
+.matrix-x-label{text-align:center;font-size:12px;color:#636e72;font-weight:600;letter-spacing:1px;margin-bottom:8px}
+.matrix-container{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;min-height:360px}
+.matrix-cell{border-radius:12px;padding:18px}
+.matrix-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.matrix-sublabel{font-size:11px;margin-bottom:12px;opacity:0.7}
+.matrix-items{display:flex;flex-wrap:wrap;gap:5px}
+.matrix-item{background:rgba(255,255,255,0.7);border-radius:6px;padding:3px 9px;font-size:12px;font-weight:500}
+.cell-quickwin{background:linear-gradient(135deg,#d4efdf,#a9dfbf);color:#1e8449}
+.cell-strategic{background:linear-gradient(135deg,#d6eaf8,#a9cce3);color:#1a5276}
+.cell-fillin{background:linear-gradient(135deg,#fef9e7,#fdebd0);color:#784212}
+.cell-avoid{background:linear-gradient(135deg,#fadbd8,#f1948a);color:#922b21}
+
+/* Badges */
+.badge-p0{display:inline-block;background:#e94560;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-p1{display:inline-block;background:#f39c12;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-p2{display:inline-block;background:#3498db;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-core{display:inline-block;background:#e94560;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-sec{display:inline-block;background:#3498db;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-guard{display:inline-block;background:#f39c12;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.stars{color:#f39c12;font-size:14px}
+.score-h{display:inline-block;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:11px;font-weight:700;color:white;background:#27ae60}
+.score-m{display:inline-block;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:11px;font-weight:700;color:white;background:#f39c12}
+
+/* Roadmap */
+.roadmap{display:flex;gap:0;margin-bottom:32px;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08)}
+.roadmap-phase{flex:1;padding:24px;position:relative}
+.roadmap-phase::after{content:'→';position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:20px;color:white;z-index:10}
+.roadmap-phase:last-child::after{display:none}
+.phase-mvp{background:linear-gradient(135deg,#1a1a2e,#0f3460);color:white}
+.phase-v2{background:linear-gradient(135deg,#533483,#764ba2);color:white}
+.phase-future{background:linear-gradient(135deg,#e94560,#c0392b);color:white}
+.rp-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:0.7;margin-bottom:6px}
+.rp-title{font-size:17px;font-weight:700;margin-bottom:10px}
+.roadmap-phase ul{list-style:none;font-size:13px;opacity:0.9}
+.roadmap-phase li{padding:3px 0 3px 14px;position:relative}
+.roadmap-phase li::before{content:'·';position:absolute;left:0;font-weight:700}
+
+/* MVP 3-col */
+.mvp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:32px}
+.mvp-card{border-radius:12px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.mvp-must{background:white;border:2px solid #27ae60}
+.mvp-v2{background:white;border:2px solid #3498db}
+.mvp-future{background:white;border:2px solid #95a5a6}
+.mvp-card-title{font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f0f0f0}
+.mvp-must .mvp-card-title{color:#27ae60}
+.mvp-v2 .mvp-card-title{color:#3498db}
+.mvp-future .mvp-card-title{color:#95a5a6}
+.mvp-item{font-size:13px;color:#2d3436;padding:5px 0 5px 16px;position:relative;border-bottom:1px dashed #f0f0f0}
+.mvp-item:last-child{border-bottom:none}
+.mvp-must .mvp-item::before{content:'✓';position:absolute;left:0;color:#27ae60;font-weight:700}
+.mvp-v2 .mvp-item::before{content:'→';position:absolute;left:0;color:#3498db;font-weight:700}
+.mvp-future .mvp-item::before{content:'◦';position:absolute;left:0;color:#95a5a6;font-weight:700}
+
+/* Spec summary */
+.spec-summary{background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;border-radius:16px;padding:40px;margin-bottom:24px}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+.spec-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#e94560;margin-bottom:8px}
+.spec-value{font-size:13px;color:rgba(255,255,255,0.9);line-height:1.7}
+.spec-value ul{list-style:none;padding:0}
+.spec-value li{padding:2px 0 2px 14px;position:relative}
+.spec-value li::before{content:'·';position:absolute;left:0;color:#e94560;font-weight:700}
+
+/* Assumptions */
+.assumption-list{list-style:none;counter-reset:assum}
+.assumption-list li{counter-increment:assum;padding:14px 16px 14px 56px;background:white;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 8px rgba(0,0,0,0.04);position:relative;font-size:14px;border-left:3px solid #667eea}
+.assumption-list li::before{content:counter(assum);position:absolute;left:16px;top:50%;transform:translateY(-50%);width:26px;height:26px;background:#eef2ff;color:#667eea;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+/* Logic chain */
+.logic-chain{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.chain-node{background:white;border-radius:12px;padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,0.08);text-align:center;max-width:170px;transition:transform 0.2s}
+.chain-node:hover{transform:translateY(-2px)}
+.chain-label{font-size:10px;color:#636e72;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;font-weight:600}
+.chain-content{font-size:12px;font-weight:600;color:#1a1a2e;line-height:1.4}
+.chain-arrow{font-size:22px;color:#e94560;padding:0 6px;flex-shrink:0}
+
+/* Section backgrounds */
+.sec-discover{background:#f8f9fa}
+.sec-define{background:#fff5f7}
+.sec-develop{background:#f0f8ff}
+.sec-deliver{background:#f0fff4}
+.sec-entry{background:white}
+
+/* Metric row colors */
+.row-core td:first-child{border-left:4px solid #e94560}
+.row-sec td:first-child{border-left:4px solid #3498db}
+.row-guard td:first-child{border-left:4px solid #f39c12}
+.row-top{background:#fff8f9 !important}
+
+/* Footer */
+footer{background:#1a1a2e;color:rgba(255,255,255,0.5);text-align:center;padding:32px;font-size:13px}
+footer strong{color:rgba(255,255,255,0.8)}
+
+/* Stage defs table */
+.def-unified{color:#27ae60;font-weight:600}
+.def-varied{color:#e94560}
+.def-ambiguous{color:#f39c12}
+
+/* Responsive */
+@media(max-width:768px){
+  .hero h1{font-size:26px}
+  .persona-grid{grid-template-columns:1fr}
+  .mvp-grid{grid-template-columns:1fr}
+  .spec-grid{grid-template-columns:1fr}
+  .matrix-container{grid-template-columns:1fr;grid-template-rows:auto}
+  .roadmap{flex-direction:column}
+  .roadmap-phase::after{display:none}
+  .logic-chain{flex-direction:column}
+  .chain-arrow{transform:rotate(90deg)}
+}
+@media print{
+  .sticky-nav{display:none}
+  .hero,.roadmap-phase,.spec-summary{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .card,table{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">產品企劃報告 · Double Diamond</div>
+  <h1>手術時間即時記錄系統</h1>
+  <p class="subtitle">讓手術室每個時間節點都有準確的即時記錄，從手動出發，邁向 AI 全自動辨識</p>
+  <div class="hero-meta">
+    <span>📅 2026年3月25日</span>
+    <span>📋 版本 v1.0</span>
+    <span>🏥 醫療科技 · 全新產品</span>
+    <span>🔄 手動 → 半自動 → 全自動</span>
+  </div>
+</section>
+
+<!-- NAV -->
+<nav class="sticky-nav">
+  <div class="nav-inner">
+    <a href="#discover" class="nav-item">🔍 Discover</a>
+    <a href="#define" class="nav-item">🎯 Define</a>
+    <a href="#develop" class="nav-item">💡 Develop</a>
+    <a href="#deliver" class="nav-item">🚀 Deliver</a>
+    <a href="#entry" class="nav-item">⭐ 切入點</a>
+  </div>
+</nav>
+
+<!-- ═══════════ DISCOVER ═══════════ -->
+<section id="discover" class="sec-discover">
+<div class="container">
+  <div class="section-header">
+    <div class="section-icon icon-discover">🔍</div>
+    <div class="section-header-text">
+      <h2>Discover — 理解用戶與場景</h2>
+      <p>發散思考，全面理解手術室環境中的目標用戶</p>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">1.1 Persona Table</h3>
+  <div class="insight-box">
+    <strong>切分邏輯</strong>
+    以「與時間記錄系統的關係」而非職稱來分群：誰是即時記錄者？誰是數據確認者？誰是數據使用者？同一職稱的人在不同任務情境下，需求完全不同。
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>欄位</th><th>P1：巡迴護士</th><th>P2：麻醉師</th><th>P3：護理長/主管</th><th>P4：AI工程師</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>用途/任務/動機</strong></td><td>手術中即時記錄各階段時間點</td><td>記錄麻醉相關時間節點</td><td>使用數據分析手術室效率與排班</td><td>取得高品質標記數據用於 AI 模型訓練</td></tr>
+        <tr><td><strong>規模（SIZE）</strong></td><td>大（每台手術必有一位）</td><td>中（每台手術必有，但人數少）</td><td>小（每院一至數位）</td><td>小（技術團隊）</td></tr>
+        <tr><td><strong>問題/挑戰</strong></td><td>雙手忙、注意力在患者，無法從容記錄</td><td>高度集中在患者生命徵象，時間記錄是次要任務</td><td>現有數據不準確，無法做出有效的效率改善決策</td><td>數據誤差大、格式不一，每次整合需大量清洗</td></tr>
+        <tr><td><strong>現在做法</strong></td><td>寫在手臂上 / 術後靠記憶補填，以麻醉時間為錨點推算其他時間</td><td>腦記或手寫，術後補填；部分醫院有 AIMS 自動記錄</td><td>人工彙整術後記錄，與麻醉記錄比對（時常對不上）</td><td>依賴不精確的人工彙整數據，排除大量誤差過大的樣本</td></tr>
+        <tr><td><strong>頻率</strong></td><td>每台手術（每天多台）</td><td>每台手術（只記 2–3 個點）</td><td>每日/每週查看報表</td><td>週期性數據提取與模型更新</td></tr>
+        <tr><td><strong>資訊來源</strong></td><td>麻醉系統時間（術後核對）、手臂筆記、外科醫師行為觸發</td><td>麻醉機螢幕、AIMS（若有）、手工記錄</td><td>手術排班系統、護理師手動填報記錄</td><td>醫院 HIS 匯出、護理師提供的手術記錄</td></tr>
+        <tr><td><strong>執行問題</strong></td><td>記憶誤差 10–30 分鐘、無法騰手操作介面</td><td>記錄方式不統一（各院 AIMS 設備不同）、與護理師時間有時對不上</td><td>數據來源多元且不一致，難以做跨手術室比較</td><td>誤差大導致訓練集縮水，格式不統一需額外工程整合</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection-title">手術階段定義一覽（以某院客戶為例）</h3>
+  <div class="insight-box">
+    <strong>重要背景</strong>
+    每間醫院對各階段的觸發定義略有不同，以下為某院標準，並標記各院的一致性程度。
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>階段</th><th>觸發定義</th><th>記錄者</th><th>一致性</th></tr></thead>
+      <tbody>
+        <tr><td>到等待室</td><td>病人報到後開始算</td><td>護理師</td><td class="def-unified">各院較一致</td></tr>
+        <tr><td>進手術室</td><td>病床推入 OR</td><td>護理師</td><td class="def-unified">一致（有物理事件）</td></tr>
+        <tr><td>麻醉開始</td><td>麻醉科判定（標準需和麻醉科確認）</td><td>麻醉師提供</td><td class="def-varied">各院/各醫師標準不同</td></tr>
+        <tr><td>手術準備</td><td>鋪單？備械？各說各話</td><td>護理師（粗抓）</td><td class="def-ambiguous">定義模糊，粗抓</td></tr>
+        <tr><td>TIME OUT</td><td>衛服部規定宣告（病患名字、年紀、開刀位置、術法、預計出血量、時間）</td><td>護理師記錄</td><td class="def-varied">部分醫師會跳過</td></tr>
+        <tr><td>手術開始</td><td>劃刀（主流約 70%）或喊完 TIME OUT 後</td><td>護理師目視</td><td class="def-ambiguous">主流=劃刀，但仍有差異</td></tr>
+        <tr><td>手術結束</td><td>縫完傷口貼完紗布</td><td>護理師目視</td><td class="def-unified">較一致</td></tr>
+        <tr><td>麻醉結束</td><td>麻醉科判定（標準需和麻醉科確認）</td><td>麻醉師提供</td><td class="def-varied">各院/各醫師標準不同</td></tr>
+        <tr><td>出手術室</td><td>病床推出手術室</td><td>護理師</td><td class="def-unified">一致（有物理事件）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection-title">1.2 Persona 卡片</h3>
+  <div class="persona-grid">
+    <div class="persona-card">
+      <div class="persona-card-header p1h">
+        <div class="persona-name">小陳</div>
+        <div class="persona-role">巡迴護士 — 主要操作者</div>
+        <div class="persona-priority">★★★ 核心 TA</div>
+      </div>
+      <div class="persona-card-body">
+        <div class="persona-tags"><span class="tag">高頻使用者</span><span class="tag">多工高壓</span><span class="tag">雙手常被佔用</span></div>
+        <div class="info-row"><span class="info-label">背景</span><span>每天協助 3–6 台手術，是手術室中「什麼都要管」的角色</span></div>
+        <div class="info-row"><span class="info-label">目標</span><span>不影響手術前提下準確記錄時間，術後快速完成填報</span></div>
+        <div class="pain-points">
+          <h4>核心痛點</h4>
+          <ul>
+            <li>手術中無法騰手觸碰介面</li>
+            <li>關鍵時間點無預警，來不及記錄</li>
+            <li>術後補填靠記憶，誤差 10–30 分鐘</li>
+            <li>以麻醉時間推算其他時間，非獨立記錄</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-card-header p2h">
+        <div class="persona-name">王醫師</div>
+        <div class="persona-role">麻醉師 — 次要操作者</div>
+        <div class="persona-priority">★★ 重要 TA</div>
+      </div>
+      <div class="persona-card-body">
+        <div class="persona-tags"><span class="tag">高度專業</span><span class="tag">精確度要求高</span><span class="tag">不喜被打擾</span></div>
+        <div class="info-row"><span class="info-label">背景</span><span>注意力幾乎全在患者生命徵象，麻醉時間對計費記錄很重要</span></div>
+        <div class="info-row"><span class="info-label">目標</span><span>精確記錄麻醉起訖，確保與護理師時間能對上</span></div>
+        <div class="pain-points">
+          <h4>核心痛點</h4>
+          <ul>
+            <li>高壓時刻根本沒空記錄，只能事後回想</li>
+            <li>各院記錄方式不統一（AIMS / 人工）</li>
+            <li>自己的時間與護理師有時差數分鐘</li>
+            <li>不希望多一個要學習的新系統</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-card-header p3h">
+        <div class="persona-name">林護理長</div>
+        <div class="persona-role">手術室主管 — 數據使用者</div>
+        <div class="persona-priority">★ 次要 TA</div>
+      </div>
+      <div class="persona-card-body">
+        <div class="persona-tags"><span class="tag">數據導向</span><span class="tag">效率分析</span><span class="tag">管理決策</span></div>
+        <div class="info-row"><span class="info-label">背景</span><span>管理多間手術室排班和效率分析，現有數據太不可靠</span></div>
+        <div class="info-row"><span class="info-label">目標</span><span>掌握各階段實際耗時，找出延誤環節，向管理層報告</span></div>
+        <div class="pain-points">
+          <h4>核心痛點</h4>
+          <ul>
+            <li>數據缺乏可信度，無法作為決策依據</li>
+            <li>彙整耗時，發現問題已是事後一週</li>
+            <li>不同護理師標準不同，難以橫向比較</li>
+            <li>向管理層報告時數據可靠性常被質疑</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-card-header p4h">
+        <div class="persona-name">志明</div>
+        <div class="persona-role">AI產品工程師 — 系統整合者</div>
+        <div class="persona-priority">★ 未來 TA</div>
+      </div>
+      <div class="persona-card-body">
+        <div class="persona-tags"><span class="tag">數據品質敏感</span><span class="tag">格式標準化</span><span class="tag">API整合</span></div>
+        <div class="info-row"><span class="info-label">背景</span><span>開發 AI 手術房狀態辨識系統，需要大量高品質標記數據</span></div>
+        <div class="info-row"><span class="info-label">目標</span><span>取得格式統一、時間準確的數據，直接串接 AI 訓練流程</span></div>
+        <div class="pain-points">
+          <h4>核心痛點</h4>
+          <ul>
+            <li>誤差大（10–30 分鐘）導致模型訓練效果差</li>
+            <li>格式不統一，每次整合需要額外工程</li>
+            <li>希望有 real-time webhook 做即時驗證</li>
+            <li>需要數據來源標記（手動/系統建議/自動）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">1.3 User Journey Map — 巡迴護士（小陳）</h3>
+  <div class="insight-box">
+    <strong>任務：在一台手術中記錄所有時間節點並完成術後填報</strong>
+    起點：術前準備；終點：系統填報完成。情緒最低點在術後補填——距事件發生已 30–90 分鐘，完全靠記憶重建，是所有誤差的集中爆發點。
+  </div>
+  <div class="card">
+    <div class="card-title">概覽表</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>階段</th><th>核心行為</th><th>情緒</th><th>關鍵痛點</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>術前準備</td><td>確認手術資訊，心裡預備要記哪些時間點</td><td>😐 平穩</td><td>沒有統一提示，完全靠個人習慣和經驗</td></tr>
+          <tr><td>2</td><td>病人進入</td><td>病人推床進入 OR，核對身份，開始準備</td><td>🟡 備戰</td><td>手邊若有事要做，這個時間點可能沒記到</td></tr>
+          <tr><td>3</td><td>麻醉階段</td><td>協助麻醉師準備，嘗試記下麻醉開始時間</td><td>😰 注意力分散</td><td>協助操作中完全無法騰手，依賴事後麻醉系統推算</td></tr>
+          <tr><td>4</td><td>手術準備 / TIME OUT</td><td>鋪無菌單、器械確認、TIME OUT 宣告</td><td>🔴 高度緊繃</td><td>TIME OUT 由外科醫師宣告，轉瞬即過，護理師常在忙中錯過</td></tr>
+          <tr><td>5</td><td>手術進行中</td><td>持續協助手術，某個時刻手術「突然就開始了」</td><td>🔴 多工高壓</td><td>劃刀無聲無預警，護理師視線不一定在刀上</td></tr>
+          <tr><td>6</td><td>手術結束 / 麻醉結束</td><td>外科縫合，護士清點，麻醉師開始逆轉麻醉</td><td>🟡 稍微鬆一口氣</td><td>「結束」定義本身模糊，不同護理師認定的終點不同</td></tr>
+          <tr><td>7</td><td>術後補填</td><td>病人送出後，到手術室電腦對著麻醉系統時間推算補填</td><td>😔 疲憊 + 高誤差</td><td>以麻醉時間「反推」所有時間點，誤差在此集中爆發</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h4 style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:10px;margin-top:24px;">各階段詳細展開（點擊展開）</h4>
+  <details class="accordion"><summary>階段 1：術前準備</summary><div class="accordion-content">
+    <div class="detail-row"><span class="detail-label">Doing</span><span>確認今天手術排程、準備器械、心裡盤點待會要記的時間節點</span></div>
+    <div class="detail-row"><span class="detail-label">Thinking</span><span>「今天有幾台，待會要記得病人進來的時間，還有 TIMEOUT…」</span></div>
+    <div class="detail-row"><span class="detail-label">Feeling</span><span>平穩，這是例行公事</span></div>
+    <div class="detail-row"><span class="detail-label">Stakeholder</span><span>護理長（交班）、器械護士</span></div>
+    <div class="detail-row"><span class="detail-label">Problem</span><span>沒有系統提醒今天需要記哪些節點，完全靠個人習慣和經驗</span></div>
+  </div></details>
+  <details class="accordion"><summary>階段 2：病人進入</summary><div class="accordion-content">
+    <div class="detail-row"><span class="detail-label">Doing</span><span>迎接病人推床進入，核對身份，開始準備</span></div>
+    <div class="detail-row"><span class="detail-label">Thinking</span><span>「幾點？3:02？還是 3:03？先記著。」</span></div>
+    <div class="detail-row"><span class="detail-label">Feeling</span><span>開始進入工作狀態，這個時間點相對好記</span></div>
+    <div class="detail-row"><span class="detail-label">Stakeholder</span><span>病人、推床人員、麻醉師</span></div>
+    <div class="detail-row"><span class="detail-label">Problem</span><span>若手邊有事要做，這個時間點可能沒記到，只能事後推算</span></div>
+  </div></details>
+  <details class="accordion"><summary>階段 3：麻醉階段</summary><div class="accordion-content">
+    <div class="detail-row"><span class="detail-label">Doing</span><span>協助麻醉師準備藥物、固定病人、監測協助</span></div>
+    <div class="detail-row"><span class="detail-label">Thinking</span><span>「麻醉師說開始了，現在幾點…但我手上正在接管路，沒辦法看時鐘」</span></div>
+    <div class="detail-row"><span class="detail-label">Feeling</span><span>注意力被拉往多處，內心有點焦慮</span></div>
+    <div class="detail-row"><span class="detail-label">Stakeholder</span><span>麻醉師、病人</span></div>
+    <div class="detail-row"><span class="detail-label">Problem</span><span>麻醉開始時護理師往往在協助操作，完全無法騰手；依賴事後看麻醉系統推算，但各院串接方式不同</span></div>
+  </div></details>
+  <details class="accordion"><summary>階段 4：手術準備 / TIME OUT</summary><div class="accordion-content">
+    <div class="detail-row"><span class="detail-label">Doing</span><span>鋪無菌單、器械確認、外科醫師進場，TIME OUT 宣告（衛服部規定宣讀：病患名字、年紀、開刀位置、術法、預計出血量、時間）</span></div>
+    <div class="detail-row"><span class="detail-label">Thinking</span><span>「TIME OUT 開始了，我要記時間，但我正在確認器械清單…」</span></div>
+    <div class="detail-row"><span class="detail-label">Feeling</span><span>高度緊張，注意力必須在安全核查上，記時間是次要的</span></div>
+    <div class="detail-row"><span class="detail-label">Stakeholder</span><span>外科醫師、器械護士、麻醉師、全體手術人員</span></div>
+    <div class="detail-row"><span class="detail-label">Problem</span><span>TIME OUT 由外科醫師宣告，部分醫師會跳過；「宣告」轉瞬即過，沒有明確視覺提示</span></div>
+  </div></details>
+  <details class="accordion"><summary>階段 5：手術進行中</summary><div class="accordion-content">
+    <div class="detail-row"><span class="detail-label">Doing</span><span>持續協助手術、補充器械、記錄用藥，在某個時刻手術「突然就開始了」</span></div>
+    <div class="detail-row"><span class="detail-label">Thinking</span><span>「剛才劃刀了嗎？我沒注意到，現在幾點…算了先記個大概」</span></div>
+    <div class="detail-row"><span class="detail-label">Feeling</span><span>多工高壓，記時間完全不是優先事項</span></div>
+    <div class="detail-row"><span class="detail-label">Stakeholder</span><span>外科醫師、器械護士</span></div>
+    <div class="detail-row"><span class="detail-label">Problem</span><span>「手術開始」最重要的時間點，反而最難捕捉——劃刀無聲，護理師視線不一定在手術位置上</span></div>
+  </div></details>
+  <details class="accordion"><summary>階段 6：手術結束 / 麻醉結束</summary><div class="accordion-content">
+    <div class="detail-row"><span class="detail-label">Doing</span><span>外科醫師縫合傷口、貼紗布，護理師清點器械，麻醉師開始逆轉麻醉</span></div>
+    <div class="detail-row"><span class="detail-label">Thinking</span><span>「手術結束是縫完算，還是他說結束算？麻醉什麼時候停的？」</span></div>
+    <div class="detail-row"><span class="detail-label">Feeling</span><span>稍微鬆一口氣，但還有很多收尾工作</span></div>
+    <div class="detail-row"><span class="detail-label">Stakeholder</span><span>外科醫師、麻醉師、器械護士</span></div>
+    <div class="detail-row"><span class="detail-label">Problem</span><span>「結束」定義本身模糊（縫完＋貼紗布才算），不同護理師認定的終點不同，造成數據不一致</span></div>
+  </div></details>
+  <details class="accordion"><summary>階段 7：術後補填</summary><div class="accordion-content">
+    <div class="detail-row"><span class="detail-label">Doing</span><span>病人送出後，走到手術室電腦，打開手術/排程系統，參考麻醉系統時間推算並 Key 入各時間點（當天結束前必填完）</span></div>
+    <div class="detail-row"><span class="detail-label">Thinking</span><span>「麻醉系統說麻醉是 14:32 開始的…那手術開始大概是 14:50？好像是，就填這個吧」</span></div>
+    <div class="detail-row"><span class="detail-label">Feeling</span><span>疲憊，這是最後一道關，也是誤差最大的一道</span></div>
+    <div class="detail-row"><span class="detail-label">Stakeholder</span><span>醫院 HIS 系統、麻醉師（有時需要口頭確認）</span></div>
+    <div class="detail-row"><span class="detail-label">Problem</span><span>以麻醉時間為錨點「反推」所有其他時間，等於把所有誤差集中在這個步驟；下一台手術可能已在催了，填報更草率；時間誤差可達 10–30 分鐘</span></div>
+  </div></details>
+
+</div></section>
+
+<!-- ═══════════ DEFINE ═══════════ -->
+<section id="define" class="sec-define">
+<div class="container">
+  <div class="section-header">
+    <div class="section-icon icon-define">🎯</div>
+    <div class="section-header-text">
+      <h2>Define — 收斂問題</h2>
+      <p>從 Discover 的發散中收斂，找到最值得解決的問題</p>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">2.1 痛點彙整表</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>編號</th><th>痛點描述</th><th>來源 Persona</th><th>出現階段</th><th>影響程度</th><th>出現頻率</th></tr></thead>
+      <tbody>
+        <tr class="row-top"><td><strong>P1</strong></td><td>手術中雙手被佔用（手套/操作），無法觸碰介面記錄時間</td><td>P1 巡迴護士</td><td>麻醉～手術結束</td><td><span class="score-h">高</span></td><td><span class="score-h">高</span></td></tr>
+        <tr class="row-top"><td><strong>P2</strong></td><td>關鍵時間點（劃刀、TIME OUT）發生當下無預警，護理師來不及記</td><td>P1 巡迴護士</td><td>TIME OUT、手術開始</td><td><span class="score-h">高</span></td><td><span class="score-h">高</span></td></tr>
+        <tr class="row-top"><td><strong>P3</strong></td><td>術後補填靠記憶重建，距事件發生 30–90 分鐘，誤差大</td><td>P1 巡迴護士</td><td>術後補填</td><td><span class="score-h">高</span></td><td><span class="score-h">高</span></td></tr>
+        <tr class="row-top"><td><strong>P4</strong></td><td>各時間點定義不統一（劃刀 vs. TIME OUT 後），跨護理師/醫院數據無法比較</td><td>P1、P3</td><td>全程</td><td><span class="score-h">高</span></td><td><span class="score-h">高</span></td></tr>
+        <tr class="row-top"><td><strong>P5</strong></td><td>麻醉時間是唯一可信錨點，其他時間點都是相對推算，非獨立記錄</td><td>P1、P2</td><td>術後補填</td><td><span class="score-h">高</span></td><td><span class="score-h">高</span></td></tr>
+        <tr><td><strong>P6</strong></td><td>TIME OUT 有時被醫師跳過，護理師沒有機制標記「本台未執行」</td><td>P1、P3</td><td>TIME OUT</td><td><span class="score-m">中</span></td><td><span class="score-m">中</span></td></tr>
+        <tr><td><strong>P7</strong></td><td>手術準備階段定義模糊，各人粗抓，數據意義低</td><td>P1</td><td>手術準備</td><td><span class="score-m">中</span></td><td><span class="score-h">高</span></td></tr>
+        <tr><td><strong>P8</strong></td><td>護理長拿到的時間數據不準確，無法做有意義的效率分析與排班優化</td><td>P3 護理長</td><td>術後/管理層</td><td><span class="score-h">高</span></td><td><span class="score-h">高</span></td></tr>
+        <tr><td><strong>P9</strong></td><td>時間數據格式不統一、誤差大，AI 訓練前需大量清洗</td><td>P4 AI工程師</td><td>數據使用端</td><td><span class="score-h">高</span></td><td><span class="score-h">高</span></td></tr>
+        <tr><td><strong>P10</strong></td><td>各醫院的時間點定義與流程不同，系統若無法彈性適配，推廣阻力大</td><td>P1、P2、P3</td><td>系統設計層</td><td><span class="score-m">中</span></td><td><span class="score-h">高</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection-title">2.2 HMW 問題轉化</h3>
+  <div class="hmw-grid">
+    <div class="hmw-card"><div class="hmw-num">HMW 1 · P1</div><div class="hmw-pain">手術中無法觸碰介面</div><div class="hmw-question">我們可以如何讓護理師在雙手被佔用的情況下，仍能完成時間點記錄？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 2 · P2</div><div class="hmw-pain">關鍵時間點無預警發生</div><div class="hmw-question">我們可以如何讓記錄動作在事件發生的瞬間就能觸發，而不需要護理師提前預備？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 3 · P3</div><div class="hmw-pain">術後補填靠記憶重建</div><div class="hmw-question">我們可以如何消除「術後補填」這個步驟，讓時間自動在事件當下被捕捉？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 4 · P4</div><div class="hmw-pain">時間點定義不統一</div><div class="hmw-question">我們可以如何在保持各醫院彈性的前提下，讓同一醫院的護理師使用一致的記錄標準？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 5 · P5</div><div class="hmw-pain">其他時間靠麻醉時間反推</div><div class="hmw-question">我們可以如何讓每個時間點都有獨立的即時記錄，不再依賴麻醉時間反推？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 6 · P6</div><div class="hmw-pain">TIME OUT 跳過無法標記</div><div class="hmw-question">我們可以如何讓護理師快速標記「TIME OUT 未執行」，同時不增加操作負擔？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 7 · P7</div><div class="hmw-pain">手術準備定義模糊</div><div class="hmw-question">我們可以如何幫助各院統一「手術準備」的起始定義，讓這個數據變得有意義？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 8 · P8</div><div class="hmw-pain">護理長拿不到可靠數據</div><div class="hmw-question">我們可以如何讓護理長即時或接近即時地看到準確的手術進度數據？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 9 · P9</div><div class="hmw-pain">AI 數據品質差需大量清洗</div><div class="hmw-question">我們可以如何在記錄端就確保數據格式標準化，讓 AI 團隊直接使用？</div></div>
+    <div class="hmw-card"><div class="hmw-num">HMW 10 · P10</div><div class="hmw-pain">各醫院流程不同難推廣</div><div class="hmw-question">我們可以如何設計一個可彈性設定階段定義的系統，讓不同醫院都能快速上線？</div></div>
+  </div>
+
+  <h3 class="subsection-title">2.3 機會評估表</h3>
+  <div class="insight-box">
+    <strong>關鍵發現</strong>
+    HMW1–3+5 本質上是同一個核心問題的四個切面，必須一起解決。HMW4+10（彈性設定）是推廣的前提；HMW9（數據標準化）是 AI 整合的基礎門票。
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>HMW 問題</th><th>影響 Persona</th><th>Persona 規模</th><th>用戶影響</th><th>商業價值</th><th>可行性</th><th>總分</th><th>優先級</th></tr></thead>
+      <tbody>
+        <tr class="row-top"><td>HMW1：雙手被佔用仍能記錄</td><td>P1</td><td>大</td><td>5</td><td>5</td><td>3</td><td><strong>13</strong></td><td><span class="stars">★★★</span></td></tr>
+        <tr class="row-top"><td>HMW2：事件當下即時觸發</td><td>P1</td><td>大</td><td>5</td><td>5</td><td>3</td><td><strong>13</strong></td><td><span class="stars">★★★</span></td></tr>
+        <tr class="row-top"><td>HMW3：消除術後補填</td><td>P1、P3</td><td>大+小</td><td>5</td><td>4</td><td>4</td><td><strong>13</strong></td><td><span class="stars">★★★</span></td></tr>
+        <tr class="row-top"><td>HMW5：每個時間點獨立記錄</td><td>P1、P2、P4</td><td>大+中+小</td><td>4</td><td>5</td><td>4</td><td><strong>13</strong></td><td><span class="stars">★★★</span></td></tr>
+        <tr><td>HMW4：統一標準保持彈性</td><td>P1、P3</td><td>大+小</td><td>3</td><td>5</td><td>4</td><td><strong>12</strong></td><td><span class="stars">★★</span></td></tr>
+        <tr><td>HMW10：各院彈性快速上線</td><td>P1、P2、P3</td><td>大+中+小</td><td>3</td><td>5</td><td>4</td><td><strong>12</strong></td><td><span class="stars">★★</span></td></tr>
+        <tr><td>HMW9：記錄端數據格式標準化</td><td>P4</td><td>小</td><td>2</td><td>5</td><td>5</td><td><strong>12</strong></td><td><span class="stars">★★</span></td></tr>
+        <tr><td>HMW8：護理長即時看數據</td><td>P3</td><td>小</td><td>3</td><td>4</td><td>4</td><td><strong>11</strong></td><td><span class="stars">★★</span></td></tr>
+        <tr><td>HMW6：TIME OUT 未執行標記</td><td>P1、P3</td><td>大+小</td><td>3</td><td>3</td><td>5</td><td><strong>11</strong></td><td><span class="stars">★</span></td></tr>
+        <tr><td>HMW7：統一手術準備定義</td><td>P1</td><td>大</td><td>2</td><td>3</td><td>3</td><td><strong>8</strong></td><td><span class="stars">★</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></section>
+
+<!-- ═══════════ DEVELOP ═══════════ -->
+<section id="develop" class="sec-develop">
+<div class="container">
+  <div class="section-header">
+    <div class="section-icon icon-develop">💡</div>
+    <div class="section-header-text">
+      <h2>Develop — 發想解法</h2>
+      <p>針對已定義的核心問題，發散產生多種解法並評估優先級</p>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">自動化演進路線圖</h3>
+  <div class="insight-box">
+    <strong>核心策略</strong>
+    MVP 手動記錄的每一筆數據，同時是 AI 半自動/全自動的訓練基礎。數據格式從第一天就要設計好，避免技術債。每筆記錄須標記來源（手動/系統建議/自動），讓 AI 團隊可按品質分層使用。
+  </div>
+  <div class="roadmap">
+    <div class="roadmap-phase phase-mvp">
+      <div class="rp-label">Phase 1 · MVP</div>
+      <div class="rp-title">手動記錄</div>
+      <ul>
+        <li>護理師主動觸發記錄</li>
+        <li>大按鈕即時記錄介面</li>
+        <li>稽核軌跡 + 可修改</li>
+        <li>累積乾淨標記數據</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase phase-v2">
+      <div class="rp-label">Phase 2 · V2</div>
+      <div class="rp-title">半自動輔助</div>
+      <ul>
+        <li>語音辨識輸入選項</li>
+        <li>感測器事件自動建議</li>
+        <li>護理師確認或修正</li>
+        <li>修正數據繼續訓練模型</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase phase-future">
+      <div class="rp-label">Phase 3 · Future</div>
+      <div class="rp-title">AI 全自動辨識</div>
+      <ul>
+        <li>AI 視覺辨識自動觸發</li>
+        <li>護理師僅在異常時介入</li>
+        <li>串接醫院 HIS 自動填入</li>
+        <li>手動系統退場或作備援</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">3.1 解法發想表</h3>
+  <h4 style="font-size:13px;font-weight:600;color:#636e72;margin-bottom:10px;">輸入方式解法（HMW1 + HMW2）</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>方案</th><th>輸入方式</th><th>描述</th><th>優點</th><th>風險/限制</th></tr></thead>
+      <tbody>
+        <tr><td><strong>A</strong></td><td>語音辨識</td><td>護理師說關鍵字，系統自動打時間戳</td><td>完全免動手、零視線轉移</td><td>手術室噪音干擾、繁中辨識率、誤觸發風險</td></tr>
+        <tr><td><strong>B</strong></td><td>實體大按鈕面板</td><td>每個階段一顆大按鈕，手套可操作</td><td>可靠度高、直覺、無需看螢幕</td><td>需額外硬體、各院空間不同</td></tr>
+        <tr><td><strong>C</strong></td><td>腳踏板</td><td>踩下腳踏板記錄下一個待記錄階段</td><td>完全解放雙手</td><td>需腳的注意力、踩錯問題、需螢幕確認</td></tr>
+        <tr><td><strong>D</strong></td><td>手勢辨識</td><td>攝影機辨識特定手勢觸發記錄</td><td>免動手、免開口</td><td>手套遮擋、光線變化、辨識不穩定、開發成本極高</td></tr>
+        <tr><td><strong>E</strong></td><td>觸控螢幕介面（多載體）</td><td>響應式大按鈕介面，相容電腦/平板/觸控面板</td><td>多載體通用、視覺清楚、可自訂</td><td>一般電容觸控不支援手術手套，需特殊螢幕或選配觸控筆</td></tr>
+        <tr><td><strong>F</strong></td><td>穿戴式腕部按鈕</td><td>手腕戴無線小按鈕，按下記錄當前階段</td><td>隨身攜帶、隨時可按</td><td>無菌環境限制、消耗品成本、充電維護</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h4 style="font-size:13px;font-weight:600;color:#636e72;margin:18px 0 10px;">系統功能解法（HMW3–10）</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>方案</th><th>功能類別</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><strong>G</strong></td><td>即時記錄 + 修改 + 稽核軌跡</td><td>記錄後可修改，保留原始時間和修改原因，維持數據可信度</td></tr>
+        <tr><td><strong>H</strong></td><td>彈性階段設定面板</td><td>系統導入人員可自訂各院的手術階段名稱、順序、必填/選填，無需改動程式碼</td></tr>
+        <tr><td><strong>I</strong></td><td>跳過 + 標記原因</td><td>TIME OUT 等可選填階段可標記「未執行」，不影響其他階段記錄</td></tr>
+        <tr><td><strong>J</strong></td><td>標準化數據輸出</td><td>每台手術完成後自動產出結構化 JSON/CSV，含數據來源標記（手動/系統建議/自動）</td></tr>
+        <tr><td><strong>K</strong></td><td>與手術系統串接</td><td>提供 API，數據直接推送到醫院現有手術/排程系統，免去護理師二次 Key 入</td></tr>
+        <tr><td><strong>L</strong></td><td>護理長看板</td><td>獨立管理介面，即時或每日彙整各手術室時間效率數據</td></tr>
+        <tr><td><strong>M</strong></td><td>多載體支援 + 跨手術室切換</td><td>響應式介面適配電腦/平板/觸控面板，支援快速切換手術室與手術場次</td></tr>
+        <tr><td><strong>N</strong></td><td>離線緩存 + 自動同步</td><td>網路不穩時本地暫存，連線恢復後自動同步，數據遺失率 0%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection-title">3.2 Impact / Effort 四象限</h3>
+  <div class="matrix-wrapper">
+    <div class="matrix-y-label">↑ 高影響力　低影響力 ↓</div>
+    <div class="matrix-outer">
+      <div class="matrix-x-label">← 高投入　　　　　　　　　　低投入 →</div>
+      <div class="matrix-container">
+        <div class="matrix-cell cell-strategic">
+          <div class="matrix-label">Strategic</div><div class="matrix-sublabel">規劃執行</div>
+          <div class="matrix-items"><span class="matrix-item">A. 語音辨識</span><span class="matrix-item">K. 串接手術系統</span><span class="matrix-item">L. 護理長看板</span></div>
+        </div>
+        <div class="matrix-cell cell-quickwin">
+          <div class="matrix-label">⚡ Quick Win</div><div class="matrix-sublabel">立即執行</div>
+          <div class="matrix-items"><span class="matrix-item">E. 觸控介面（多載體）</span><span class="matrix-item">G. 即時記錄+稽核軌跡</span><span class="matrix-item">H. 彈性階段設定</span><span class="matrix-item">I. 跳過+標記原因</span><span class="matrix-item">J. 標準化數據輸出</span><span class="matrix-item">M. 跨手術室切換</span><span class="matrix-item">N. 離線緩存</span></div>
+        </div>
+        <div class="matrix-cell cell-avoid">
+          <div class="matrix-label">Avoid</div><div class="matrix-sublabel">暫不考慮</div>
+          <div class="matrix-items"><span class="matrix-item">D. 手勢辨識</span></div>
+        </div>
+        <div class="matrix-cell cell-fillin">
+          <div class="matrix-label">Fill-in</div><div class="matrix-sublabel">有空再做</div>
+          <div class="matrix-items"><span class="matrix-item">B. 實體按鈕面板</span><span class="matrix-item">C. 腳踏板</span><span class="matrix-item">F. 穿戴式按鈕</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">3.3 User Story 表</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>編號</th><th>User Story</th><th>驗收標準</th><th>優先級</th></tr></thead>
+      <tbody>
+        <tr><td><strong>US1</strong></td><td>身為巡迴護士，我想要在雙手被佔用時仍能記錄時間，以便不打斷手術進行</td><td>護士不需要觸碰螢幕即可完成至少一種記錄方式</td><td><span class="badge-p0">P0</span></td></tr>
+        <tr><td><strong>US2</strong></td><td>身為巡迴護士，我想要在事件發生當下立即記錄，以便時間點誤差在 30 秒以內</td><td>從觸發到記錄完成的操作時間 ≤ 3 秒</td><td><span class="badge-p0">P0</span></td></tr>
+        <tr><td><strong>US3</strong></td><td>身為巡迴護士，我想要能快速修改剛才記錯的時間，以便不需要中斷工作再回頭處理</td><td>修改操作 ≤ 5 秒完成，保留原始記錄與稽核軌跡</td><td><span class="badge-p0">P0</span></td></tr>
+        <tr><td><strong>US4</strong></td><td>身為巡迴護士，我想要標記「TIME OUT 未執行」，以便法規合規紀錄完整</td><td>一鍵標記跳過，不影響後續階段記錄</td><td><span class="badge-p0">P0</span></td></tr>
+        <tr><td><strong>US5</strong></td><td>身為系統導入人員，我想要透過管理介面設定各院的手術階段名稱、順序與必填規則，以便新醫院不需工程師介入即可快速上線</td><td>非工程師的導入人員可在 15 分鐘內完成一間醫院的階段設定，無需改動程式碼</td><td><span class="badge-p1">P1</span></td></tr>
+        <tr><td><strong>US6</strong></td><td>身為護理長，我想要查看每台手術的時間效率報表，以便找出流程瓶頸</td><td>可查看單台手術各階段時長，以及跨手術室的比較</td><td><span class="badge-p1">P1</span></td></tr>
+        <tr><td><strong>US7</strong></td><td>身為 AI 工程師，我想要取得結構化的手術時間數據，以便直接用於模型訓練</td><td>系統輸出 JSON 格式，含所有階段 timestamp 和記錄來源標記</td><td><span class="badge-p1">P1</span></td></tr>
+        <tr><td><strong>US8</strong></td><td>身為護理師，我想要用平板在不同手術室間快速切換當前作業場次，以便一台設備服務多間手術室</td><td>切換手術室/場次操作 ≤ 10 秒，不誤混入其他手術的記錄</td><td><span class="badge-p1">P1</span></td></tr>
+        <tr><td><strong>US9</strong></td><td>身為護理師，我想要在手術室網路不穩時系統仍能正常記錄，以便不遺漏任何時間點</td><td>離線狀態可正常記錄，連線恢復後自動同步，數據遺失率 0%</td><td><span class="badge-p1">P1</span></td></tr>
+        <tr><td><strong>US10</strong></td><td>身為護理師，我想要系統能串接現有手術系統，以便不需要二次 Key 入</td><td>數據可透過 API 推送至醫院現有系統</td><td><span class="badge-p2">P2</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection-title">3.4 MVP 範圍定義</h3>
+  <div class="mvp-grid">
+    <div class="mvp-card mvp-must">
+      <div class="mvp-card-title">✓ MVP 必須有</div>
+      <div class="mvp-item">響應式大按鈕記錄介面（電腦/平板/觸控面板通用）</div>
+      <div class="mvp-item">即時記錄時間戳 + 螢幕即時確認回饋</div>
+      <div class="mvp-item">快速修改 + 稽核軌跡（保留原始記錄）</div>
+      <div class="mvp-item">TIME OUT 等選填階段跳過 + 標記未執行</div>
+      <div class="mvp-item">系統導入人員階段設定介面</div>
+      <div class="mvp-item">標準化 JSON/CSV 匯出（含數據來源標記）</div>
+      <div class="mvp-item">多載體支援 + 跨手術室快速切換</div>
+      <div class="mvp-item">離線緩存 + 連線恢復自動同步</div>
+    </div>
+    <div class="mvp-card mvp-v2">
+      <div class="mvp-card-title">→ V2 再加入</div>
+      <div class="mvp-item">語音辨識輸入選項</div>
+      <div class="mvp-item">感測器事件自動建議時間點</div>
+      <div class="mvp-item">護理長效率看板（跨手術室比較）</div>
+      <div class="mvp-item">Real-time API webhook 推送</div>
+      <div class="mvp-item">實體大按鈕面板（硬體配件）</div>
+      <div class="mvp-item">跨院模板庫</div>
+    </div>
+    <div class="mvp-card mvp-future">
+      <div class="mvp-card-title">◦ 未來考慮</div>
+      <div class="mvp-item">AI 視覺辨識自動記錄所有階段</div>
+      <div class="mvp-item">自動串接醫院 HIS 免手動填報</div>
+      <div class="mvp-item">手勢辨識輸入</div>
+      <div class="mvp-item">腳踏板輸入</div>
+      <div class="mvp-item">穿戴式腕部按鈕</div>
+      <div class="mvp-item">AI 數據品質儀表板</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ═══════════ DELIVER ═══════════ -->
+<section id="deliver" class="sec-deliver">
+<div class="container">
+  <div class="section-header">
+    <div class="section-icon icon-deliver">🚀</div>
+    <div class="section-header-text">
+      <h2>Deliver — 規劃執行</h2>
+      <p>定義成功指標與產品規格，確保方向清晰可執行</p>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">4.1 成功指標表</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>指標類型</th><th>指標名稱</th><th>定義</th><th>目標值</th><th>衡量方式</th></tr></thead>
+      <tbody>
+        <tr class="row-core"><td><span class="badge-core">核心</span></td><td>時間點記錄準確率</td><td>系統記錄時間 vs. 獨立觀察員記錄時間的誤差</td><td>誤差 &lt; 2 分鐘（MVP）→ &lt; 30 秒（V2）</td><td>導入初期安排觀察員同步記錄比對</td></tr>
+        <tr class="row-core"><td><span class="badge-core">核心</span></td><td>即時記錄率</td><td>手術中即時記錄的時間點佔總時間點的比例</td><td>&gt; 80%（MVP）→ &gt; 95%（V2）</td><td>系統自動計算記錄時間點與手術進行時間的時差</td></tr>
+        <tr class="row-core"><td><span class="badge-core">核心</span></td><td>術後補填時間縮短率</td><td>導入前後護理師花在術後補填的時間比較</td><td>縮短 &gt; 70%</td><td>導入前問卷基準 + 導入後系統 log</td></tr>
+        <tr class="row-sec"><td><span class="badge-sec">次要</span></td><td>單次記錄操作時間</td><td>從意圖記錄到系統完成記錄的時間</td><td>≤ 3 秒</td><td>系統 log 計算</td></tr>
+        <tr class="row-sec"><td><span class="badge-sec">次要</span></td><td>護理師滿意度</td><td>使用體驗 NPS 或簡易評分</td><td>≥ 4/5 分</td><td>每月簡短問卷</td></tr>
+        <tr class="row-sec"><td><span class="badge-sec">次要</span></td><td>新醫院上線時間</td><td>從合約簽署到系統可正式使用的天數</td><td>≤ 3 天</td><td>專案紀錄</td></tr>
+        <tr class="row-sec"><td><span class="badge-sec">次要</span></td><td>數據完整率</td><td>每台手術中必填時間點的填寫完整比例</td><td>&gt; 95%</td><td>系統自動統計</td></tr>
+        <tr class="row-guard"><td><span class="badge-guard">護欄</span></td><td>手術流程干擾事件</td><td>因使用系統導致護理師分心或影響手術安全的事件數</td><td>0 件</td><td>護理師主動回報 + 巡訪觀察</td></tr>
+        <tr class="row-guard"><td><span class="badge-guard">護欄</span></td><td>系統當機率</td><td>手術進行中系統無法使用的次數</td><td>每月 &lt; 1 次</td><td>系統監控</td></tr>
+        <tr class="row-guard"><td><span class="badge-guard">護欄</span></td><td>數據遺失率</td><td>手術完成後數據無法讀取或遺失的比例</td><td>0%</td><td>系統自動備份驗證</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection-title">4.2 產品規格摘要</h3>
+  <div class="spec-summary">
+    <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">手術時間即時記錄系統</h2>
+    <p style="color:rgba(255,255,255,0.55);font-size:13px;">產品規格摘要 · v1.0 · 2026.03.25</p>
+    <div class="spec-grid">
+      <div><div class="spec-label">目標 Persona</div><div class="spec-value"><ul><li>主要 — P1 巡迴護士（即時記錄者）</li><li>次要 — P2 麻醉師（麻醉時間提供者）</li><li>受益 — P3 護理長、P4 AI 工程師</li></ul></div></div>
+      <div><div class="spec-label">核心問題</div><div class="spec-value">如何讓護理師在雙手被佔用、注意力高度集中的手術環境中，在事件發生的當下即時記錄各階段時間點，並確保數據準確到足以支撐效率分析與 AI 訓練？</div></div>
+      <div><div class="spec-label">解決方案（MVP）</div><div class="spec-value"><ul><li>響應式大按鈕記錄介面（電腦/平板/觸控面板）</li><li>按下即記時間戳，螢幕即時回饋</li><li>快速修改 + 稽核軌跡</li><li>TIME OUT 跳過標記機制</li><li>管理員階段設定介面（各院可客製）</li><li>JSON/CSV 標準化匯出</li><li>離線緩存 + 自動同步</li></ul></div></div>
+      <div><div class="spec-label">MVP 驗證門檻</div><div class="spec-value"><ul><li>時間點誤差 &lt; 2 分鐘</li><li>即時記錄率 &gt; 80%</li><li>術後補填時間縮短 &gt; 70%</li><li>手術流程干擾事件 = 0</li></ul></div></div>
+      <div><div class="spec-label">自動化路線</div><div class="spec-value">手動（MVP）→ 感測器半自動輔助（V2）→ AI 全自動辨識（未來）<br>MVP 手動數據同時作為 AI 訓練的地基數據</div></div>
+      <div><div class="spec-label">載體策略</div><div class="spec-value">軟體優先、硬體彈性：相容現有手術室電腦、平板（跨房攜帶）、觸控面板；響應式設計統一支援三種載體</div></div>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">需驗證的關鍵假設</h3>
+  <ol class="assumption-list">
+    <li>護理師在手術中能夠抽出 2–3 秒看向並操作介面（電腦/平板/面板），且不影響手術安全</li>
+    <li>現有手術室電腦的擺放位置與護理師動線相容；若不相容，需評估增設平板或實體按鈕面板</li>
+    <li>大按鈕介面的學習曲線低到足以讓護理師在第一台手術就能順利使用，無需長時間培訓</li>
+    <li>各醫院願意在導入時配合統一部分時間點定義（尤其是「手術開始 = 劃刀」），作為最小共識</li>
+    <li>MVP 收集的手動數據品質（誤差 &lt; 2 分鐘），足夠作為 V2 半自動模型的訓練基礎</li>
+  </ol>
+</div></section>
+
+<!-- ═══════════ ENTRY POINT ═══════════ -->
+<section id="entry" class="sec-entry">
+<div class="container">
+  <div class="section-header">
+    <div class="section-icon icon-entry">⭐</div>
+    <div class="section-header-text">
+      <h2>最佳切入點分析</h2>
+      <p>從 Persona 痛點到產品建議的完整邏輯鏈</p>
+    </div>
+  </div>
+
+  <div class="logic-chain">
+    <div class="chain-node"><div class="chain-label">Persona 痛點</div><div class="chain-content">巡迴護士雙手被佔用＋事件無預警 → 只能術後靠記憶推估</div></div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-node"><div class="chain-label">定義的核心問題</div><div class="chain-content">如何讓護理師在事件發生當下，以最低動作完成即時記錄？</div></div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-node"><div class="chain-label">MVP 解法</div><div class="chain-content">響應式大按鈕介面＋稽核軌跡修改＋彈性階段設定</div></div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-node"><div class="chain-label">最佳切入點</div><div class="chain-content">軟體優先跑在現有電腦/平板，驗證準確度後再擴展輸入方式</div></div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-node"><div class="chain-label">長期目標</div><div class="chain-content">手動數據成為 AI 訓練基礎，逐步邁向全自動辨識</div></div>
+  </div>
+
+  <div class="card" style="border-left:4px solid #e94560;">
+    <div class="card-title">第一步行動建議</div>
+    <p style="font-size:14px;line-height:1.8;color:#2d3436;">帶著「大按鈕即時記錄」的低保真原型（紙本模擬或簡單 UI）進手術室，讓一位巡迴護士實際走一遍一台手術的流程，觀察她在哪個階段根本沒辦法操作介面。這個觀察將直接決定：</p>
+    <ul style="font-size:14px;margin-top:12px;padding-left:20px;color:#2d3436;line-height:2;">
+      <li>電腦擺放位置是否適合，還是需要平板或獨立按鈕面板</li>
+      <li>哪些階段的時間點完全需要輔助輸入方式（語音/腳踏板）</li>
+      <li>V2 的輸入方式投資優先順序</li>
+    </ul>
+  </div>
+</div></section>
+
+<footer>
+  <p><strong>手術時間即時記錄系統</strong> — 產品企劃報告</p>
+  <p style="margin-top:8px;">產出日期：2026年3月25日 &nbsp;·&nbsp; 框架：Double Diamond (Discover → Define → Develop → Deliver) &nbsp;·&nbsp; <strong>Powered by Claude</strong></p>
+</footer>
+
+<script>
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})});
+});
+// Active nav
+const secs=document.querySelectorAll('section[id]');
+const navs=document.querySelectorAll('.nav-item');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navs.forEach(n=>n.classList.remove('active'));
+      const a=document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+      if(a)a.classList.add('active');
+    }
+  });
+},{threshold:0.25,rootMargin:'-60px 0px -55% 0px'});
+secs.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
